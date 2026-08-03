@@ -2,13 +2,13 @@
 
 # 🧠 Mental Health Score Prediction System
 
-An AI-powered web application that predicts a user's mental health score based on lifestyle and behavioral factors. The system leverages Machine Learning to provide personalized insights and recommendations through an intuitive web interface.
+An AI-powered web application that predicts a user's mental health score based on lifestyle and behavioural factors. The system leverages Machine Learning to provide personalised insights and recommendations through an intuitive web interface.
 
 ---
 
 ## 📌 Overview
 
-Mental health is influenced by several daily lifestyle factors such as sleep quality, stress levels, physical activity, and screen time. This project aims to analyze these factors using a Machine Learning model and generate an easy-to-understand mental health report.
+Mental health is influenced by several daily lifestyle factors such as sleep quality, stress levels, physical activity, and screen time. This project aims to analyse these factors using a Machine Learning model and generate an easy-to-understand mental health report.
 
 The project was developed from scratch, including data preprocessing, model training, API development, frontend integration, and deployment.
 
@@ -17,7 +17,7 @@ The project was developed from scratch, including data preprocessing, model trai
 ## ✨ Features
 
 * 🧠 Predicts Mental Health Score using Machine Learning
-* 😴 Analyzes Sleep Quality
+* 😴 Analyses Sleep Quality
 * ⚡ Evaluates Stress Level
 * 🏃 Measures Physical Activity
 * 📱 Reviews Screen Time

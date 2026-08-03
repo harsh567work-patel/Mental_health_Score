@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MindScore — AI Mental Health Predictor</title>
+  <meta name="description" content="AI-powered mental health assessment using machine learning." />
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ─────────────────────────────────────────────
+       THEME TOGGLE
+  ───────────────────────────────────────────── -->
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+    <span class="theme-icon" id="themeIcon">☀️</span>
+  </button>
+
+  <!-- ─────────────────────────────────────────────
+       ANIMATED BACKGROUND CANVAS
+  ───────────────────────────────────────────── -->
+  <canvas id="bgCanvas" aria-hidden="true"></canvas>
+
+  <!-- ─────────────────────────────────────────────
+       HERO / LANDING SECTION
+  ───────────────────────────────────────────── -->
+  <section class="hero" id="hero" aria-label="Hero section">
+
+    <!-- Floating decorative blobs -->
+    <div class="blob blob-1" aria-hidden="true"></div>
+    <div class="blob blob-2" aria-hidden="true"></div>
+    <div class="blob blob-3" aria-hidden="true"></div>
+
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot" aria-hidden="true"></span>
+        AI-Powered Assessment
+      </div>
+
+      <h1 class="hero-title">
+        <span class="title-line-1">Mental Health</span>
+        <span class="title-line-2 gradient-text">Score Predictor</span>
+      </h1>
+
+      <p class="hero-subtitle">
+        AI-powered mental health assessment using machine learning.<br />
+        Understand your wellbeing in minutes.
+      </p>
+
+      <!-- SVG Illustration -->
+      <div class="hero-illustration" aria-hidden="true">
+        <svg viewBox="0 0 420 220" fill="none" xmlns="http://www.w3.org/2000/svg" class="hero-svg">
+          <!-- Brain outline -->
+          <ellipse cx="210" cy="110" rx="90" ry="75" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.35"/>
+          <!-- Inner brain hemispheres -->
+          <path d="M210 60 Q255 70 255 110 Q255 150 210 160" stroke="var(--accent)" stroke-width="2" fill="none" opacity="0.6"/>
+          <path d="M210 60 Q165 70 165 110 Q165 150 210 160" stroke="var(--accent-2)" stroke-width="2" fill="none" opacity="0.6"/>
+          <!-- Neural connections -->
+          <circle cx="180" cy="95" r="4" fill="var(--accent)" opacity="0.9"/>
+          <circle cx="240" cy="95" r="4" fill="var(--accent-2)" opacity="0.9"/>
+          <circle cx="210" cy="130" r="4" fill="var(--accent)" opacity="0.9"/>
+          <circle cx="195" cy="115" r="3" fill="var(--accent-2)" opacity="0.7"/>
+          <circle cx="225" cy="115" r="3" fill="var(--accent)" opacity="0.7"/>
+          <line x1="180" y1="95" x2="210" y2="130" stroke="var(--accent)" stroke-width="1" opacity="0.5"/>
+          <line x1="240" y1="95" x2="210" y2="130" stroke="var(--accent-2)" stroke-width="1" opacity="0.5"/>
+          <line x1="180" y1="95" x2="240" y2="95" stroke="var(--accent)" stroke-width="1" opacity="0.4"/>
+          <line x1="195" y1="115" x2="225" y2="115" stroke="var(--accent-2)" stroke-width="1" opacity="0.4"/>
+          <!-- Pulse rings -->
+          <circle cx="210" cy="110" r="30" stroke="var(--accent)" stroke-width="1" fill="none" opacity="0.2" class="pulse-ring"/>
+          <circle cx="210" cy="110" r="50" stroke="var(--accent-2)" stroke-width="1" fill="none" opacity="0.15" class="pulse-ring-2"/>
+          <!-- Data nodes around -->
+          <circle cx="120" cy="75" r="5" fill="var(--accent)" opacity="0.6"/>
+          <circle cx="300" cy="75" r="5" fill="var(--accent-2)" opacity="0.6"/>
+          <circle cx="105" cy="140" r="4" fill="var(--accent)" opacity="0.5"/>
+          <circle cx="315" cy="140" r="4" fill="var(--accent-2)" opacity="0.5"/>
+          <line x1="120" y1="75" x2="165" y2="100" stroke="var(--accent)" stroke-width="1" stroke-dasharray="3 3" opacity="0.4"/>
+          <line x1="300" y1="75" x2="255" y2="100" stroke="var(--accent-2)" stroke-width="1" stroke-dasharray="3 3" opacity="0.4"/>
+          <!-- Score badge -->
+          <rect x="330" y="85" width="75" height="50" rx="12" fill="var(--glass-bg)" stroke="var(--border)" stroke-width="1"/>
+          <text x="367" y="107" text-anchor="middle" fill="var(--accent)" font-size="14" font-weight="700" font-family="system-ui">82</text>
+          <text x="367" y="122" text-anchor="middle" fill="var(--text-muted)" font-size="9" font-family="system-ui">SCORE</text>
+          <!-- Floating metric cards -->
+          <rect x="15" y="85" width="80" height="50" rx="12" fill="var(--glass-bg)" stroke="var(--border)" stroke-width="1"/>
+          <text x="55" y="107" text-anchor="middle" fill="var(--accent-2)" font-size="10" font-family="system-ui">Sleep</text>
+          <text x="55" y="122" text-anchor="middle" fill="var(--text-primary)" font-size="12" font-weight="600" font-family="system-ui">7.5h</text>
+        </svg>
+      </div>
+
+      <!-- Glassmorphism stat cards -->
+      <div class="hero-stats" role="list">
+        <div class="stat-card glass" role="listitem">
+          <span class="stat-icon" aria-hidden="true">🧠</span>
+          <span class="stat-label">ML Powered</span>
+        </div>
+        <div class="stat-card glass" role="listitem">
+          <span class="stat-icon" aria-hidden="true">⚡</span>
+          <span class="stat-label">Real-time</span>
+        </div>
+        <div class="stat-card glass" role="listitem">
+          <span class="stat-icon" aria-hidden="true">🔒</span>
+          <span class="stat-label">Private</span>
+        </div>
+      </div>
+
+      <!-- CTA Button -->
+      <button class="btn-primary glow-btn" id="startBtn" onclick="scrollToForm()" aria-label="Start mental health assessment">
+        <span class="btn-ripple" aria-hidden="true"></span>
+        Start Assessment
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </button>
+
+      <!-- Scroll indicator -->
+      <div class="scroll-indicator" aria-label="Scroll down">
+        <span class="scroll-text">Scroll to begin</span>
+        <div class="scroll-arrow" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 5v14M5 12l7 7 7-7"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────
+       MULTI-STEP ASSESSMENT FORM SECTION
+  ───────────────────────────────────────────── -->
+  <section class="form-section" id="assessmentForm" aria-label="Assessment form">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-eyebrow">Step-by-step</span>
+        <h2 class="section-title">Your Assessment</h2>
+        <p class="section-subtitle">Answer honestly for the most accurate mental health prediction.</p>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="progress-container" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="3" aria-label="Form progress">
+        <div class="progress-steps">
+          <div class="step-indicator active" data-step="1">
+            <span class="step-num">1</span>
+            <span class="step-name">Lifestyle</span>
+          </div>
+          <div class="step-connector"></div>
+          <div class="step-indicator" data-step="2">
+            <span class="step-num">2</span>
+            <span class="step-name">Digital Habits</span>
+          </div>
+          <div class="step-connector"></div>
+          <div class="step-indicator" data-step="3">
+            <span class="step-num">3</span>
+            <span class="step-name">About You</span>
+          </div>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" id="progressFill" style="width: 33%"></div>
+        </div>
+      </div>
+
+      <!-- FORM -->
+      <div class="form-card glass">
+        <form id="predictForm" novalidate aria-label="Mental health prediction form">
+
+          <!-- ── STEP 1: Lifestyle ── -->
+          <div class="form-step active" id="step1" data-step="1">
+            <h3 class="step-title">
+              <span class="step-icon" aria-hidden="true">🌿</span>
+              Lifestyle & Academics
+            </h3>
+
+            <!-- Age -->
+            <!--
+              ═══════════════════════════════════════════════════════
+              FIELD: Age
+              FastAPI JSON key: "Age"
+              Type: Integer (10 – 100)
+              ═══════════════════════════════════════════════════════
+            -->
+            <div class="field-group" id="field-age">
+              <label class="field-label" for="age">
+                <span class="label-icon" aria-hidden="true">🎂</span>
+                Age
+              </label>
+              <p class="field-helper">Enter your age for a more accurate prediction.</p>
+              <div class="number-input-wrap">
+                <input
+                  type="number"
+                  id="age"
+                  name="Age"
+                  min="10" max="100"
+                  value="25"
+                  class="number-input"
+                  aria-describedby="ageErr"
+                />
+              </div>
+              <span class="field-error" id="ageErr" role="alert" aria-live="assertive"></span>
+            </div>
+
+            <!-- Study Hours -->
+            <!--
+              ═══════════════════════════════════════════════════════
+              FIELD: Study_Hours
+              FastAPI JSON key: "Study_Hours"
+              Type: Float (0 – 24)
+              ═══════════════════════════════════════════════════════
+            -->
+            <div class="field-group" id="field-study-hours">
+              <label class="field-label" for="studyHours">
+                <span class="label-icon" aria-hidden="true">📚</span>
+                Study Hours per Day
+              </label>
+              <p class="field-helper">How many hours do you study on a typical day?</p>
+              <div class="slider-wrap">
+                <input
+                  type="range"
+                  id="studyHours"
+                  name="Study_Hours"
+                  min="0" max="16" step="0.5"
+                  value="6"
+                  class="range-input"
+                  aria-describedby="studyHoursVal studyHoursErr"
+                />
+                <div class="slider-labels">
+                  <span>0h</span>
+                  <span class="slider-val" id="studyHoursVal" aria-live="polite">6h</span>
+                  <span>16h</span>
+                </div>
+              </div>
+              <span class="field-error" id="studyHoursErr" role="alert" aria-live="assertive"></span>
+            </div>
+
+            <!-- Physical Activity Hours -->
+            <!--
+              ═══════════════════════════════════════════════════════
+              FIELD: Physical_Activity_Hours
+              FastAPI JSON key: "Physical_Activity_Hours"
+              Type: Float (0 – 12)
+              ═══════════════════════════════════════════════════════
+            -->
+            <div class="field-group" id="field-physical">
+              <label class="field-label" for="physicalHours">
+                <span class="label-icon" aria-hidden="true">🏃</span>
+                Physical Activity Hours per Day
+              </label>
+              <p class="field-helper">Exercise, sports, walks — any physical movement.</p>
+              <div class="slider-wrap">
+                <input
+                  type="range"
+                  id="physicalHours"
+                  name="Physical_Activity_Hours"
+                  min="0" max="10" step="0.5"
+                  value="1"
+                  class="range-input"
+                  aria-describedby="physicalVal physicalErr"
+                />
+                <div class="slider-labels">
+                  <span>0h</span>
+                  <span class="slider-val" id="physicalVal" aria-live="polite">1h</span>
+                  <span>10h</span>
+                </div>
+              </div>
+              <span class="field-error" id="physicalErr" role="alert" aria-live="assertive"></span>
+            </div>
+
+            <!-- Sleep Hours -->
+            <!--
+              ═══════════════════════════════════════════════════════
+              FIELD: Sleep_Hours_Per_Night
+              FastAPI JSON key: "Sleep_Hours_Per_Night"
+              Type: Float (0 – 12)
+              ═══════════════════════════════════════════════════════
+            -->
+            <div class="field-group" id="field-sleep">
+              <label class="field-label" for="sleepHours">
+                <span class="label-icon" aria-hidden="true">😴</span>
+                Sleep Hours per Night
+              </label>
+              <p class="field-helper">Average sleep you get each night.</p>
+              <div class="slider-wrap">
+                <input
+                  type="range"
+                  id="sleepHours"
+                  name="Sleep_Hours_Per_Night"
+                  min="0" max="12" step="0.5"
+                  value="7"
+                  class="range-input"
+                  aria-describedby="sleepVal sleepErr"
+                />
+                <div class="slider-labels">
+                  <span>0h</span>
+                  <span class="slider-val" id="sleepVal" aria-live="polite">7h</span>
+                  <span>12h</span>
+                </div>
+              </div>
+              <span class="field-error" id="sleepErr" role="alert" aria-live="assertive"></span>
+            </div>
+
+            <!-- Stress Level -->
+            <!--
+              ═══════════════════════════════════════════════════════
+              FIELD: Stress_Level
+              FastAPI JSON key: "Stress_Level"
+              Type: Categorical — "Normal" | "Medium" | "High" | "Very High"
+              ═══════════════════════════════════════════════════════
+            -->
+            <div class="field-group" id="field-stress">
+              <label class="field-label">
+                <span class="label-icon" aria-hidden="true">⚡</span>
+                Current Stress Level
+              </label>
+              <p class="field-helper">How stressed do you feel in general?</p>
+              <div class="radio-group" role="radiogroup" aria-label="Stress level">
+                <label class="radio-card">
+                  <input type="radio" name="Stress_Level" value="Low" checked aria-describedby="stressErr" />
+                  <span class="radio-label">😊 Low</span>
+                </label>
+                <label class="radio-card">
+                  <input type="radio" name="Stress_Level" value="Medium" aria-describedby="stressErr" />
+                  <span class="radio-label">😐 Medium</span>
+                </label>
+                <label class="radio-card">
+                  <input type="radio" name="Stress_Level" value="High" aria-describedby="stressErr" />
+                  <span class="radio-label">😰 High</span>
+                </label>
+                <label class="radio-card">
+                  <input type="radio" name="Stress_Level" value="Very High" aria-describedby="stressErr" />
+                  <span class="radio-label">🤯 Very High</span>
+                </label>
+              </div>
+              <span class="field-error" id="stressErr" role="alert" aria-live="assertive"></span>
+            </div>
+
+            <div class="step-nav">
+              <span></span>
+              <button type="button" class="btn-next" onclick="nextStep(1)" aria-label="Continue to step 2">
+                Continue
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- ── STEP 2: Digital Habits ── -->
+          <div class="form-step" id="step2" data-step="2">
+            <h3 class="step-title">
+              <span class="step-icon" aria-hidden="true">📱</span>
+              Digital Habits & Screen Time
+            </h3>
+
+            <!-- Avg Daily Usage Hours -->
+            <!--
+              ═══════════════════════════════════════════════════════
+              FIELD: Avg_Daily_Usage_Hours
+              FastAPI JSON key: "Avg_Daily_Usage_Hours"
+              Type: Float (0 – 18)
+              ═══════════════════════════════════════════════════════
+            -->
+            <div class="field-group" id="field-usage">
+              <label class="field-label" for="usageHours">
+                <span class="label-icon" aria-hidden="true">⏱️</span>
+                Average Daily Screen Time (hours)
+              </label>
+              <p class="field-helper">Total time spent on phone/computer daily.</p>
+              <div class="slider-wrap">
+                <input
+                  type="range"
+                  id="usageHours"
+                  name="Avg_Daily_Usage_Hours"
+                  min="0" max="18" step="0.5"
+                  value="4"
+                  class="range-input"
+                  aria-describedby="usageVal usageErr"
+                />
+                <div class="slider-labels">
+                  <span>0h</span>
+                  <span class="slider-val" id="usageVal" aria-live="polite">4h</span>
+                  <span>18h</span>
+                </div>
+              </div>
+              <span class="field-error" id="usageErr" role="alert" aria-live="assertive"></span>
+            </div>
+
+            <!-- Daily Unlocks -->
+            <!--
+              ═══════════════════════════════════════════════════════
+              FIELD: Daily_Unlocks
+              FastAPI JSON key: "Daily_Unlocks"
+              Type: Integer (0 – 200)
+              ═══════════════════════════════════════════════════════
+            -->
+            <div class="field-group" id="field-unlocks">
+              <label class="field-label" for="dailyUnlocks">
+                <span class="label-icon" aria-hidden="true">🔓</span>
+                Daily Phone Unlocks
+              </label>
+              <p class="field-helper">How many times do you unlock your phone per day?</p>
+              <div class="number-input-wrap">
+                <button type="button" class="num-btn" onclick="adjustUnlocks(-5)" aria-label="Decrease unlocks by 5">−</button>
+                <input
+                  type="number"
+                  id="dailyUnlocks"
+                  name="Daily_Unlocks"
+                  min="0" max="300"
+                  value="40"
+                  class="number-input"
+                  aria-describedby="unlocksErr"
+                />
+                <button type="button" class="num-btn" onclick="adjustUnlocks(5)" aria-label="Increase unlocks by 5">+</button>
+              </div>
+              <span class="field-error" id="unlocksErr" role="alert" aria-live="assertive"></span>
+            </div>
+
+            <!-- Most Used Platform -->
+            <!--
+              ═══════════════════════════════════════════════════════
+              FIELD: Most_Used_Platform
+              FastAPI JSON key: "Most_Used_Platform"
+              Type: Categorical — YouTube | TikTok | Instagram | Facebook |
+                                   Twitter | LinkedIn | Snapchat | WhatsApp |
+                                   WeChat | LINE
+              ═══════════════════════════════════════════════════════
+            -->
+            <div class="field-group" id="field-platform">
+              <label class="field-label" for="platform">
+                <span class="label-icon" aria-hidden="true">📲</span>
+                Most Used Social Platform
+              </label>
+              <p class="field-helper">Which platform do you spend the most time on?</p>
+              <div class="select-wrap">
+                <select id="platform" name="Most_Used_Platform" class="select-input" aria-describedby="platformErr">
+                  <option value="">Select platform…</option>
+                  <option value="YouTube">YouTube</option>
+                  <option value="TikTok">TikTok</option>
+                  <option value="Instagram">Instagram</option>
+                  <option value="Facebook">Facebook</option>
+                  <option value="Twitter">Twitter</option>
+                  <option value="LinkedIn">LinkedIn</option>
+                  <option value="Snapchat">Snapchat</option>
+                  <option value="WhatsApp">WhatsApp</option>
+                  <option value="WeChat">WeChat</option>
+                  <option value="LINE">LINE</option>
+                </select>
+                <svg class="select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+              </div>
+              <span class="field-error" id="platformErr" role="alert" aria-live="assertive"></span>
+            </div>
+
+            <!-- Purpose Of Use -->
+            <!--
+              ═══════════════════════════════════════════════════════
+              FIELD: Purpose_Of_Use
+              FastAPI JSON key: "Purpose_Of_Use"
+              Type: Categorical — Entertainment | Networking | News | Other
+              ═══════════════════════════════════════════════════════
+            -->
+            <div class="field-group" id="field-purpose">
+              <label class="field-label">
+                <span class="label-icon" aria-hidden="true">🎯</span>
+                Primary Purpose of Device Use
+              </label>
+              <p class="field-helper">Why do you mainly use your device or social media?</p>
+              <div class="radio-group purpose-group" role="radiogroup" aria-label="Purpose of use">
+                <label class="radio-card">
+                  <input type="radio" name="Purpose_Of_Use" value="Entertainment" checked aria-describedby="purposeErr" />
+                  <span class="radio-label">🎮 Entertainment</span>
+                </label>
+                <label class="radio-card">
+                  <input type="radio" name="Purpose_Of_Use" value="Networking" aria-describedby="purposeErr" />
+                  <span class="radio-label">🤝 Networking</span>
+                </label>
+                <label class="radio-card">
+                  <input type="radio" name="Purpose_Of_Use" value="News" aria-describedby="purposeErr" />
+                  <span class="radio-label">📰 News</span>
+                </label>
+                <label class="radio-card">
+                  <input type="radio" name="Purpose_Of_Use" value="Other" aria-describedby="purposeErr" />
+                  <span class="radio-label">💡 Other</span>
+                </label>
+              </div>
+              <span class="field-error" id="purposeErr" role="alert" aria-live="assertive"></span>
+            </div>
+
+            <div class="step-nav">
+              <button type="button" class="btn-back" onclick="prevStep(2)" aria-label="Go back to step 1">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back
+              </button>
+              <button type="button" class="btn-next" onclick="nextStep(2)" aria-label="Continue to step 3">
+                Continue
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- ── STEP 3: About You ── -->
+          <div class="form-step" id="step3" data-step="3">
+            <h3 class="step-title">
+              <span class="step-icon" aria-hidden="true">👤</span>
+              About You
+            </h3>
+
+            <!-- Gender -->
+            <!--
+              ═══════════════════════════════════════════════════════
+              FIELD: Gender
+              FastAPI JSON key: "Gender"
+              Type: Categorical — "Male" | "Female"
+              ═══════════════════════════════════════════════════════
+            -->
+            <div class="field-group" id="field-gender">
+              <label class="field-label">
+                <span class="label-icon" aria-hidden="true">⚧</span>
+                Gender
+              </label>
+              <p class="field-helper">Used for statistical modelling of the prediction.</p>
+              <div class="toggle-group" role="radiogroup" aria-label="Gender">
+                <label class="toggle-card" id="genderMaleLabel">
+                  <input type="radio" name="Gender" value="Male" checked aria-describedby="genderErr" />
+                  <span class="toggle-label">♂ Male</span>
+                </label>
+                <label class="toggle-card" id="genderFemaleLabel">
+                  <input type="radio" name="Gender" value="Female" aria-describedby="genderErr" />
+                  <span class="toggle-label">♀ Female</span>
+                </label>
+              </div>
+              <span class="field-error" id="genderErr" role="alert" aria-live="assertive"></span>
+            </div>
+
+            <!-- Academic Level -->
+            <!--
+              ═══════════════════════════════════════════════════════
+              FIELD: Academic_Level
+              FastAPI JSON key: "Academic_Level"
+              Type: Categorical — "High School" | "Undergraduate" | "Graduate"
+              ═══════════════════════════════════════════════════════
+            -->
+            <div class="field-group" id="field-academic">
+              <label class="field-label" for="academicLevel">
+                <span class="label-icon" aria-hidden="true">🎓</span>
+                Academic Level
+              </label>
+              <p class="field-helper">Your current or most recent level of education.</p>
+              <div class="select-wrap">
+                <select id="academicLevel" name="Academic_Level" class="select-input" aria-describedby="academicErr">
+                  <option value="">Select level…</option>
+                  <option value="High School">High School</option>
+                  <option value="Undergraduate">Undergraduate</option>
+                  <option value="Graduate">Graduate</option>
+                </select>
+                <svg class="select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+              </div>
+              <span class="field-error" id="academicErr" role="alert" aria-live="assertive"></span>
+            </div>
+
+            <!-- Grouped Countries -->
+            <!--
+              ═══════════════════════════════════════════════════════
+              FIELD: Grouped_Countries
+              FastAPI JSON key: "Grouped_Countries"
+              Type: Categorical — "India" | "Canada" | "Germany" | "France" |
+                                   "Mexico" | "Turkey" | "Other"
+              ═══════════════════════════════════════════════════════
+            -->
+            <div class="field-group" id="field-country">
+              <label class="field-label" for="country">
+                <span class="label-icon" aria-hidden="true">🌍</span>
+                Country / Region
+              </label>
+              <p class="field-helper">Where are you based? Select "Other" if not listed.</p>
+              <div class="select-wrap">
+                <select id="country" name="Grouped_Countries" class="select-input" aria-describedby="countryErr">
+                  <option value="">Select country…</option>
+                  <option value="India">🇮🇳 India</option>
+                  <option value="Canada">🇨🇦 Canada</option>
+                  <option value="Germany">🇩🇪 Germany</option>
+                  <option value="France">🇫🇷 France</option>
+                  <option value="Mexico">🇲🇽 Mexico</option>
+                  <option value="Turkey">🇹🇷 Turkey</option>
+                  <option value="Other">🌐 Other</option>
+                </select>
+                <svg class="select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+              </div>
+              <span class="field-error" id="countryErr" role="alert" aria-live="assertive"></span>
+            </div>
+
+            <div class="step-nav">
+              <button type="button" class="btn-back" onclick="prevStep(3)" aria-label="Go back to step 2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back
+              </button>
+              <button type="submit" class="btn-submit glow-btn" id="submitBtn" aria-label="Submit assessment and predict mental health score">
+                <span class="btn-ripple" aria-hidden="true"></span>
+                Predict My Score
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+              </button>
+            </div>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────
+       LOADING OVERLAY
+  ───────────────────────────────────────────── -->
+  <div class="loading-overlay hidden" id="loadingOverlay" role="status" aria-live="polite" aria-label="Loading prediction">
+    <div class="loading-content">
+      <div class="loading-ring" aria-hidden="true">
+        <div class="ring-outer"></div>
+        <div class="ring-inner"></div>
+        <div class="ring-core">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 2L2 7l10 5 10-5-10-5z" fill="var(--accent)" opacity="0.8"/>
+            <path d="M2 17l10 5 10-5" stroke="var(--accent)" stroke-width="2" fill="none" opacity="0.6"/>
+            <path d="M2 12l10 5 10-5" stroke="var(--accent-2)" stroke-width="2" fill="none" opacity="0.6"/>
+          </svg>
+        </div>
+      </div>
+      <p class="loading-text" id="loadingText" aria-live="polite">Analyzing behavior...</p>
+      <div class="loading-bar-wrap" aria-hidden="true">
+        <div class="loading-bar" id="loadingBar"></div>
+      </div>
+      <p class="loading-subtext">Running your model…</p>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────
+       RESULTS DASHBOARD SECTION
+  ───────────────────────────────────────────── -->
+  <section class="results-section hidden" id="resultsDashboard" aria-label="Prediction results">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-eyebrow">Your Report</span>
+        <h2 class="section-title">Mental Health Report</h2>
+      </div>
+
+      <!-- Score Row -->
+      <div class="score-row">
+
+        <!-- Circular gauge + horizontal meter -->
+        <div class="score-gauge-card glass">
+          <div class="gauge-wrap" aria-label="Mental health score gauge">
+            <svg class="gauge-svg" viewBox="0 0 200 200" aria-hidden="true">
+              <circle cx="100" cy="100" r="80" class="gauge-track"/>
+              <circle cx="100" cy="100" r="80" class="gauge-fill" id="gaugeFill"/>
+            </svg>
+            <div class="gauge-center">
+              <span class="score-number" id="scoreDisplay" aria-live="polite">0</span>
+              <span class="score-label">/ 100</span>
+            </div>
+          </div>
+
+          <!-- Horizontal score meter -->
+          <div class="score-meter" aria-label="Score meter">
+            <div class="score-meter-track">
+              <div class="score-meter-fill" id="scoreMeterFill"></div>
+              <div class="score-meter-thumb" id="scoreMeterThumb"></div>
+            </div>
+            <div class="score-meter-labels">
+              <span>0</span>
+              <span>25</span>
+              <span>50</span>
+              <span>75</span>
+              <span>100</span>
+            </div>
+          </div>
+
+          <div class="status-badge" id="statusBadge" aria-live="polite"></div>
+        </div>
+
+        <!-- Score meta cards with stat bars -->
+        <div class="score-meta">
+          <div class="meta-card glass reveal-card" id="metaSleep">
+            <div class="meta-icon-wrap" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </div>
+            <div class="meta-content">
+              <p class="meta-title">Sleep Quality</p>
+              <p class="meta-val" id="metaSleepVal">—</p>
+              <div class="stat-bar"><div class="stat-bar-fill" id="statBarSleep"></div></div>
+            </div>
+          </div>
+          <div class="meta-card glass reveal-card" id="metaStress">
+            <div class="meta-icon-wrap" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </div>
+            <div class="meta-content">
+              <p class="meta-title">Stress Level</p>
+              <p class="meta-val" id="metaStressVal">—</p>
+              <div class="stat-bar"><div class="stat-bar-fill" id="statBarStress"></div></div>
+            </div>
+          </div>
+          <div class="meta-card glass reveal-card" id="metaScreen">
+            <div class="meta-icon-wrap" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+            </div>
+            <div class="meta-content">
+              <p class="meta-title">Screen Time</p>
+              <p class="meta-val" id="metaScreenVal">—</p>
+              <div class="stat-bar"><div class="stat-bar-fill" id="statBarScreen"></div></div>
+            </div>
+          </div>
+          <div class="meta-card glass reveal-card" id="metaActivity">
+            <div class="meta-icon-wrap" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/><line x1="12" y1="2" x2="12" y2="4"/></svg>
+            </div>
+            <div class="meta-content">
+              <p class="meta-title">Activity Level</p>
+              <p class="meta-val" id="metaActivityVal">—</p>
+              <div class="stat-bar"><div class="stat-bar-fill" id="statBarActivity"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Insight Cards ── -->
+      <div class="insights-grid" aria-label="Personalized insights">
+        <div class="insight-card glass reveal-card" id="insightSleep">
+          <div class="insight-icon-wrap" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </div>
+          <h4 class="insight-title">Sleep Quality</h4>
+          <p class="insight-body" id="insightSleepText"></p>
+        </div>
+        <div class="insight-card glass reveal-card" id="insightStress">
+          <div class="insight-icon-wrap" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <h4 class="insight-title">Academic Stress</h4>
+          <p class="insight-body" id="insightStressText"></p>
+        </div>
+        <div class="insight-card glass reveal-card" id="insightScreen">
+          <div class="insight-icon-wrap" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          </div>
+          <h4 class="insight-title">Screen Time</h4>
+          <p class="insight-body" id="insightScreenText"></p>
+        </div>
+        <div class="insight-card glass reveal-card" id="insightActivity">
+          <div class="insight-icon-wrap" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <h4 class="insight-title">Lifestyle Balance</h4>
+          <p class="insight-body" id="insightActivityText"></p>
+        </div>
+        <div class="insight-card glass reveal-card" id="insightSocial">
+          <div class="insight-icon-wrap" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <h4 class="insight-title">Social Interaction</h4>
+          <p class="insight-body" id="insightSocialText"></p>
+        </div>
+        <div class="insight-card glass reveal-card" id="insightWellness">
+          <div class="insight-icon-wrap" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </div>
+          <h4 class="insight-title">Mental Wellness</h4>
+          <p class="insight-body" id="insightWellnessText"></p>
+        </div>
+      </div>
+
+      <!-- ── Charts Row ── -->
+      <div class="charts-grid" aria-label="Mental health charts">
+        <div class="chart-card glass">
+          <h4 class="chart-title">Wellness Breakdown</h4>
+          <canvas id="radarChart" aria-label="Radar chart showing wellness factors" role="img"></canvas>
+        </div>
+        <div class="chart-card glass">
+          <h4 class="chart-title">Score vs Ideal</h4>
+          <canvas id="barChart" aria-label="Bar chart comparing your metrics to ideal" role="img"></canvas>
+        </div>
+      </div>
+
+      <!-- ── Recommendations ── -->
+      <div class="recommendations-section">
+        <h3 class="reco-title">
+          Personalized Recommendations
+        </h3>
+        <div class="reco-grid" id="recoGrid" aria-label="Recommendations"></div>
+      </div>
+
+      <!-- Retake button -->
+      <div class="retake-wrap">
+        <button class="btn-secondary" onclick="resetForm()" aria-label="Retake the assessment">
+          Retake Assessment
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────
+       FOOTER
+  ───────────────────────────────────────────── -->
+  <footer class="site-footer" role="contentinfo">
+    <p>MindScore — AI Mental Health Predictor &nbsp;·&nbsp; Built for portfolio &amp; research demo</p>
+    <p class="footer-note">Predictions are generated by your FastAPI ML backend, not this frontend.</p>
+  </footer>
+
+  <!-- JavaScript -->
+  <script src="script.js?v=2"></script>
+</body>
+</html>
